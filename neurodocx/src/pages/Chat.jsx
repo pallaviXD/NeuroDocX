@@ -340,7 +340,7 @@ export default function Chat() {
           </button>
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-[#7d2347]/50">Groq LLM</span>
+            <span className="text-xs text-[#7d2347]/50">AI Ready</span>
           </div>
         </div>
 
