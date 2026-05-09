@@ -1,12 +1,14 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-# Block ALL HuggingFace network calls — use local cache only
 import os
 import logging
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["HF_DATASETS_OFFLINE"] = "1"
-os.environ["HF_HUB_OFFLINE"] = "1"
+
+# On Railway/production: allow HuggingFace to download model on first start
+# On local: use cached model (set TRANSFORMERS_OFFLINE=1 in local .env)
+if os.getenv("TRANSFORMERS_OFFLINE") == "1":
+    os.environ["HF_DATASETS_OFFLINE"] = "1"
+    os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
 logging.basicConfig(level=logging.INFO)
@@ -27,10 +29,20 @@ app = FastAPI(
     description="AI-Powered PDF Intelligence Platform",
 )
 
+# CORS — allow localhost dev + production frontend URL
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000",
+]
+frontend_url = os.getenv("FRONTEND_URL", "")
+if frontend_url:
+    ALLOWED_ORIGINS.append(frontend_url)
+
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,7 +59,6 @@ app.include_router(exam_router.router)
 def startup():
     init_db()
     logger.info("NeuroDocX v2.0 backend started")
-    logger.info("API docs: http://localhost:8000/docs")
 
 
 @app.get("/")

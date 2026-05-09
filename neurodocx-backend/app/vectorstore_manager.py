@@ -5,11 +5,6 @@ import numpy as np
 from typing import List, Dict, Optional
 from sentence_transformers import SentenceTransformer
 
-# Disable ALL HuggingFace network calls — use cached model only
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["HF_DATASETS_OFFLINE"] = "1"
-os.environ["SENTENCE_TRANSFORMERS_HOME"] = os.path.join(os.path.dirname(__file__), "..", "model_cache")
-
 _model: Optional[SentenceTransformer] = None
 _index_cache: Dict[str, faiss.Index] = {}
 _chunks_cache: Dict[str, List[Dict]] = {}
@@ -18,13 +13,10 @@ _chunks_cache: Dict[str, List[Dict]] = {}
 def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
-        cache_dir = os.path.join(os.path.dirname(__file__), "..", "model_cache")
+        cache_dir = os.getenv("SENTENCE_TRANSFORMERS_HOME",
+                              os.path.join(os.path.dirname(__file__), "..", "model_cache"))
         os.makedirs(cache_dir, exist_ok=True)
-        # Load from local cache — never hit network
-        _model = SentenceTransformer(
-            "all-MiniLM-L6-v2",
-            cache_folder=cache_dir,
-        )
+        _model = SentenceTransformer("all-MiniLM-L6-v2", cache_folder=cache_dir)
     return _model
 
 

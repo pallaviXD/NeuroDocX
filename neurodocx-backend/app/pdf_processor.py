@@ -6,10 +6,12 @@ import os
 import re
 from typing import List, Dict, Tuple
 
-# Tesseract path for Windows
-TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-if os.path.exists(TESSERACT_PATH):
-    pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+# Tesseract path — Windows local dev only
+# On Linux (Railway/Render) tesseract is installed via nixpacks automatically
+if os.name == 'nt':
+    TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    if os.path.exists(TESSERACT_PATH):
+        pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
 
 def clean_text(text: str) -> str:
