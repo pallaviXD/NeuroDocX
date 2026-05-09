@@ -14,11 +14,17 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download the embedding model into the image at build time
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2', cache_folder='/app/model_cache')"
+
 COPY . .
 
-RUN mkdir -p uploads vectorstore model_cache
+RUN mkdir -p uploads vectorstore
 
 ENV PORT=8080
+ENV TRANSFORMERS_OFFLINE=1
+ENV HF_HUB_OFFLINE=1
+ENV SENTENCE_TRANSFORMERS_HOME=/app/model_cache
 
 EXPOSE 8080
 
