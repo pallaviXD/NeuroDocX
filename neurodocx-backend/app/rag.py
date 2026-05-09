@@ -4,7 +4,8 @@ from typing import List, Dict, Optional
 from groq import Groq
 from .vectorstore_manager import search_with_mmr, search_vectorstore
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+def get_groq_client():
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = "llama-3.3-70b-versatile"
 
 SYSTEM_PROMPT = """You are NeuroDocX, an elite AI document intelligence system — a senior research analyst, expert consultant, and academic advisor combined.
@@ -92,7 +93,7 @@ def format_sources(chunks: List[Dict]) -> List[Dict]:
 
 
 def _call_groq(messages: List[Dict], temperature: float = 0.3, max_tokens: int = 1024) -> Dict:
-    response = client.chat.completions.create(
+    response = get_groq_client().chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=temperature,
@@ -484,3 +485,4 @@ Provide brief, encouraging feedback (2-3 sentences) explaining why the correct a
         "score": 0.0,
         "feedback": f"❌ {result['content']}",
     }
+
