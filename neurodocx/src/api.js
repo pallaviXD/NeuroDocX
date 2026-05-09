@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || "https://060a3772f339dd.lhr.life"
+const BASE = import.meta.env.VITE_API_URL || "https://neurodocx-368778620053.europe-west1.run.app"
 
 function getToken() {
   return localStorage.getItem("neurodocx_token")

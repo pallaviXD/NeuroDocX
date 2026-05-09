@@ -56,9 +56,19 @@ app.include_router(exam_router.router)
 
 
 @app.on_event("startup")
-def startup():
+async def startup():
     init_db()
     logger.info("NeuroDocX v2.0 backend started")
+    # Pre-load embedding model in background so server starts fast
+    import threading
+    def preload():
+        try:
+            from app.vectorstore_manager import get_model
+            get_model()
+            logger.info("Embedding model loaded")
+        except Exception as e:
+            logger.warning(f"Model preload failed: {e}")
+    threading.Thread(target=preload, daemon=True).start()
 
 
 @app.get("/")
