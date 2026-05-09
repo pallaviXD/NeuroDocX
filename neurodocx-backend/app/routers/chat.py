@@ -309,7 +309,8 @@ def notes(
     return {"notes": content, "id": note.id}
 
 
-@router.post("/compare")def compare(
+@router.post("/compare")
+def compare(
     req: CompareRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
