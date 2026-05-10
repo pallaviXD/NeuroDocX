@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Brain, Eye, EyeOff, Loader, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { checkPasswordStrength, generatePassword } from '../api'
@@ -35,6 +35,9 @@ export default function Auth() {
 
   const { login, register } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  // Redirect back to where user came from, default to /chat
+  const from = location.state?.from || '/chat'
 
   // Live password strength check
   useEffect(() => {
@@ -106,7 +109,7 @@ export default function Auth() {
       } else {
         await register(form.email, form.username, form.password)
       }
-      navigate('/chat')
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

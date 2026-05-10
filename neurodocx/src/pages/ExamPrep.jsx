@@ -6,7 +6,7 @@ import {
   BarChart2, Award, ArrowUp, ArrowDown, Minus, Zap, Plus, X
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { listDocuments, generateExamReport, generateStudyPlan, getProgress } from '../api'
 import { jsPDF } from 'jspdf'
 
@@ -42,6 +42,7 @@ function ScoreBar({ score, label, color }) {
 export default function ExamPrep() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [docs, setDocs] = useState([])
   const [selectedDocs, setSelectedDocs] = useState([])
@@ -58,10 +59,26 @@ export default function ExamPrep() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!user) { navigate('/auth'); return }
+    if (!user) {
+      navigate('/auth', { state: { from: location.pathname } })
+      return
+    }
     listDocuments().then(setDocs).catch(() => {})
     getProgress().then(setProgress).catch(() => {})
   }, [user])
+
+  // Auto-detect subject from selected PDF names
+  useEffect(() => {
+    if (selectedDocs.length === 0 || subject) return
+    const selectedDoc = docs.find(d => d.id === selectedDocs[0])
+    if (selectedDoc) {
+      // Extract subject from filename: remove extension, replace underscores/hyphens with spaces
+      const raw = selectedDoc.name.replace(/\.pdf$/i, '').replace(/[_\-]/g, ' ')
+      // Remove common generic words
+      const cleaned = raw.replace(/\b(question|bank|answers|notes|study|material|chapter|unit|module|v\d+|final|draft)\b/gi, '').trim()
+      if (cleaned.length > 2) setSubject(cleaned)
+    }
+  }, [selectedDocs, docs])
 
   const handleReport = async () => {
     if (!selectedDocs.length) { setError('Select at least one document.'); return }

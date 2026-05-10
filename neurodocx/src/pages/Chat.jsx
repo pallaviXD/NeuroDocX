@@ -6,7 +6,7 @@ import {
   History, Plus, Trash2, MessageSquare, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   uploadPDF, listDocuments, deleteDocument,
   sendMessage as apiSendMessage, summarize, generateNotes, compareDocuments,
@@ -41,6 +41,7 @@ const WELCOME = { role: 'assistant', content: "Hi! Upload a PDF and I'll help yo
 export default function Chat() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // Panels
   const [sidePanel, setSidePanel] = useState('docs') // 'docs' | 'history'
@@ -68,7 +69,7 @@ export default function Chat() {
   const bottomRef = useRef()
 
   useEffect(() => {
-    if (!user) { navigate('/auth'); return }
+    if (!user) { navigate('/auth', { state: { from: '/chat' } }); return }
     listDocuments().then(setDocs).catch(() => {})
     listSessions().then(setSessions).catch(() => {})
   }, [user])
