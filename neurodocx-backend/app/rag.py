@@ -215,58 +215,48 @@ def generate_summary(
     context = build_context(chunks)
 
     style_prompts = {
-        "short": "Write a concise but complete executive summary (5-8 sentences) covering: main topic, key findings, methodology (if applicable), and conclusion. Use professional language.",
-        "detailed": """Write a comprehensive, professionally structured summary with the following sections:
-## 📋 Overview
-Brief description of the document's purpose and scope.
+        "short": "Write a concise 5-8 sentence summary of this specific document. Include the document's actual title/subject, key findings, and conclusion. Use only information from this document.",
+        "detailed": """Write a comprehensive summary of this specific document using only its content.
 
-## 🔑 Key Topics Covered
-Bullet-point list of all major topics with brief explanations.
+DOCUMENT OVERVIEW
+What this specific document is about, its purpose and scope.
 
-## 📊 Main Findings / Arguments
-Detailed breakdown of the core content, findings, or arguments.
+KEY TOPICS COVERED
+Numbered list of the main topics in this document with page references.
 
-## 🔬 Methodology / Approach (if applicable)
-How the work was conducted or structured.
+MAIN FINDINGS AND ARGUMENTS
+The core content, data, findings, or arguments from this document.
 
-## ✅ Conclusions & Recommendations
-What the document concludes and any recommendations made.
+METHODOLOGY OR APPROACH
+How the work is structured or conducted (if applicable).
 
-## 💡 Key Takeaway
-The single most important insight from this document.
+CONCLUSIONS AND RECOMMENDATIONS
+What this document concludes.
 
-Include page references throughout.""",
-        "bullets": """Create a structured bullet-point summary:
+Do not repeat points. Each section must contain unique information from the document.""",
+        "bullets": """Create a bullet-point summary using only content from this document:
 
-**Main Topic:** [one line]
+Main Topic: [what this document is specifically about]
 
-**Key Points:**
-• [point with page ref]
-• [point with page ref]
-...
+Key Points from the document:
+1. [specific point with page ref]
+2. [specific point with page ref]
+3. [specific point with page ref]
 
-**Important Facts & Figures:**
-• [specific data points]
+Important Data or Facts:
+1. [specific data from document]
 
-**Conclusions:**
-• [conclusion points]
-
-**Action Items / Recommendations (if any):**
-• [actionable items]""",
-        "beginner": "Write a friendly, easy-to-understand summary as if explaining to someone with no background in this topic. Use simple language, real-world analogies, and avoid jargon. Break it into short paragraphs. Start with 'This document is about...'",
-        "technical": """Write a technical summary for domain experts:
-- Use precise technical terminology
-- Include specific metrics, formulas, algorithms, or methodologies mentioned
-- Reference exact page numbers for all technical claims
-- Highlight technical innovations, limitations, and implications
-- Include any quantitative results or performance metrics""",
+Conclusions:
+1. [specific conclusion from document]""",
+        "beginner": "Explain this specific document in simple language. Start with 'This document is about...' and use only the actual content from the document. Avoid generic statements.",
+        "technical": "Write a technical summary using only the precise terminology, data, and methodology from this specific document. Include exact figures, algorithms, or technical specifications mentioned.",
     }
 
     prompt = style_prompts.get(style, style_prompts["detailed"])
     result = _call_groq([
-        {"role": "system", "content": "You are an expert document summarizer producing professional, publication-quality summaries. Always cite page numbers. Use plain text only — no markdown symbols like #, *, or **."},
-        {"role": "user", "content": f"Document content:\n{context}\n\nTask: {prompt}\n\nIMPORTANT: Use plain text only. No # symbols, no ** bold, no markdown. Use CAPITALS for headings and numbered lists for items."},
-    ], temperature=0.3, max_tokens=1500)
+        {"role": "system", "content": "You are a document summarizer. Summarize ONLY the provided document content. Do not use general knowledge. Do not repeat points. Use plain text, no markdown symbols."},
+        {"role": "user", "content": f"Document content:\n{context}\n\nTask: {prompt}\n\nIMPORTANT: Use only information from this document. No generic statements. No repeated points. Cite page numbers."},
+    ], temperature=0.1, max_tokens=1500)
     return result["content"]
 
 

@@ -83,12 +83,12 @@ export default function VoiceAssistant({ onQuery, lastAnswer, disabled }) {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — bottom right, above input bar on mobile */}
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.93 }}
         onClick={() => setOpen(o => !o)}
-        className={`fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${
+        className={`fixed bottom-20 right-3 md:bottom-6 md:right-6 z-50 w-11 h-11 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${
           phase === 'listening' ? 'bg-[#a83060] ring-4 ring-[#a83060]/30' :
           phase === 'speaking'  ? 'bg-green-500 ring-4 ring-green-400/30' :
           phase === 'thinking'  ? 'bg-blue-500 ring-4 ring-blue-400/30' :
@@ -112,7 +112,7 @@ export default function VoiceAssistant({ onQuery, lastAnswer, disabled }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.94 }}
             transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="fixed bottom-40 right-4 md:bottom-24 md:right-6 z-50 w-[320px] bg-white rounded-3xl shadow-2xl border border-[#ffe4ee] overflow-hidden"
+            className="fixed bottom-36 left-2 right-2 md:bottom-24 md:left-auto md:right-6 md:w-[320px] z-50 bg-white rounded-3xl shadow-2xl border border-[#ffe4ee] overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#a83060] to-[#c4527e] px-5 py-3.5 flex items-center justify-between">
